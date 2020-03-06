@@ -1,26 +1,33 @@
-interface UserProps {
+import axios, { AxiosResponse } from 'axios';
+import { Eventing } from './Eventing';
+
+export const USER_LABEL = {
+    id: 'id',
+    name: 'name',
+    age: 'age',
+};
+
+export interface UserProps {
+    id?: string | number;
     name: string;
     age: number;
 }
 
-interface UserEvent {
+export interface UserEvent {
     type: string;
     data: UserProps;
 }
 
-type Callback = (event: UserEvent) => void;
-type Events = { [key: string]: Callback[] };
-
 interface IUser {
-    events: Events;
     get(prop: string): number | string;
     set(update: Partial<UserProps>): void;
-    on(eventName: string, callback: Callback): void;
-    trigger(eventName: string);
+    fetch();
+    save();
 }
 
 export class User implements IUser {
-    events = {};
+    events: Eventing<UserProps> = new Eventing();
+    url = 'http://localhost:3000/users';
 
     constructor(private data: UserProps) {}
 
@@ -32,29 +39,22 @@ export class User implements IUser {
         Object.assign(this.data, update);
     }
 
-    on(eventName: string, callback: Callback) {
-        if (!this.events[eventName]) {
-            this.events[eventName] = [];
-        }
-
-        this.events[eventName].push(callback);
+    fetch(): void {
+        axios
+            .get(`${this.url}/${this.get(USER_LABEL.id)}`)
+            .then((response: AxiosResponse) => {
+                this.set(response.data);
+            });
     }
 
-    trigger(eventName: string) {
-        const handlers = this.events[eventName];
-        if (!handlers || handlers.length === 0) {
-            console.warn(
-                new Error(`${eventName} event is not assigned to any user`)
-            );
+    save() {
+        const id = this.get(USER_LABEL.id);
 
+        if (id) {
+            axios.put(`${this.url}/${id}`, this.data);
             return;
         }
 
-        this.events[eventName].forEach(callback => {
-            callback({
-                type: eventName,
-                data: this.data,
-            });
-        });
+        axios.post(`${this.url}`, this.data);
     }
 }
