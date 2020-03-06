@@ -1,24 +1,30 @@
 export type Callback = <T>(event: T) => void;
 export type Events = { [key: string]: Callback[] };
 
-interface IEventing<T> {
-    on(eventName: string, callback: Callback): void;
-    trigger(data: T, eventName: string);
+export interface MyEvent {
+    type: string;
 }
 
-export class Eventing<T> implements IEventing<T> {
-    type = {};
+interface IEventing {
+    on(eventName: string, callback: Callback): void;
+    trigger(eventName: string);
+}
+
+export class Eventing<T> implements IEventing {
+    types = {};
+
+    constructor(private data: T) {}
 
     on(eventName: string, callback: Callback) {
-        if (!this.type[eventName]) {
-            this.type[eventName] = [];
+        if (!this.types[eventName]) {
+            this.types[eventName] = [];
         }
 
-        this.type[eventName].push(callback);
+        this.types[eventName].push(callback);
     }
 
-    trigger(data: T, eventName: string) {
-        const handlers = this.type[eventName];
+    trigger(eventName: string) {
+        const handlers = this.types[eventName];
         if (!handlers || handlers.length === 0) {
             console.warn(
                 new Error(`${eventName} event is not assigned to any user`)
@@ -27,8 +33,8 @@ export class Eventing<T> implements IEventing<T> {
             return;
         }
 
-        this.type[eventName].forEach((callback: Callback) => {
-            callback({ type: eventName, data: data });
+        this.types[eventName].forEach((callback: Callback) => {
+            callback({ type: eventName, data: this.data });
         });
     }
 }

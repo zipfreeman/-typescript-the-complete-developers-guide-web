@@ -1,3 +1,29 @@
 {
-    "users": []
+  "users": [
+    {
+      "id": 1,
+      "name": "Dr. Boogaloo",
+      "age": 20
+    },
+    {
+      "name": "Dr. martin",
+      "age": 400,
+      "id": 2
+    },
+    {
+      "name": "Dr. martin",
+      "age": 400,
+      "id": 3
+    },
+    {
+      "name": "Dr. martin",
+      "age": 400,
+      "id": 4
+    },
+    {
+      "name": "Dr. martin",
+      "age": 400,
+      "id": 5
+    }
+  ]
 }
