@@ -1,0 +1,16 @@
+{
+    "private": true,
+    "scripts": {
+        "start:db": "json-server -w db.json",
+        "start:parcel": "parcel index.html",
+        "start": "concurrently yarn:start:*"
+    },
+    "devDependencies": {
+        "typescript": "^3.8.3"
+    },
+    "dependencies": {
+        "axios": "^0.19.2",
+        "concurrently": "^5.1.0",
+        "json-server": "^0.16.1"
+    }
+}
