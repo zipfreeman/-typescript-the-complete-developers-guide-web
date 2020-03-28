@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { Eventing } from './Eventing';
 import { Attributes } from './Attributes';
 import { Sync } from './Sync';
@@ -8,11 +8,12 @@ interface HasId {
 }
 
 export class Model<T extends HasId> {
-    protected attributes: Attributes<T> = new Attributes<T>(this.data);
-    protected events: Eventing<T> = new Eventing<T>(this.data);
-    protected sync: Sync<T> = new Sync<T>(this.url, this.data);
-
-    constructor(protected data: T, protected url: string) {
+    constructor(
+        protected data: T,
+        protected attributes: Attributes<T>,
+        protected events: Eventing<T>,
+        protected sync: Sync<T>
+    ) {
         console.log('Model constructor');
     }
 

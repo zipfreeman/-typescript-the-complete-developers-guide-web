@@ -25,6 +25,11 @@ someone changes their name or age = the user data is saved
 
 export class User extends Model<UserProps> {
     constructor(public data: UserProps) {
-        super(data, 'http://localhost:3000/users');
+        super(
+            data,
+            new Attributes<UserProps>(data),
+            new Eventing<UserProps>(data),
+            new Sync<UserProps>('http://localhost:3000/users', data)
+        );
     }
 }
