@@ -10,29 +10,21 @@ interface HasId {
 export class Model<T extends HasId> {
     constructor(
         protected data: T,
-        protected attributes: Attributes<T>,
-        protected events: Eventing<T>,
-        protected sync: Sync<T>
-    ) {
-        console.log('Model constructor');
-    }
+        protected attributes: Attributes<T> = new Attributes<T>(data),
+        protected events: Eventing<T> = new Eventing<T>(data),
+        protected sync: Sync<T> = new Sync<T>(
+            'http://localhost:3000/users',
+            data
+        )
+    ) {}
 
     get = this.attributes.get;
-    // get = <K extends keyof T>(prop: K): T[K] => {
-    //     return this.attributes.get(prop);
-    // };
 
-    set = (update: Partial<T>) => {
-        return this.attributes.set(update);
-    };
+    set = this.attributes.set;
 
-    on = (eventName, callback) => {
-        this.events.on(eventName, callback);
-    };
+    on = this.events.on;
 
-    trigger = eventName => {
-        this.events.trigger(eventName);
-    };
+    trigger = this.events.trigger;
 
     fetch = async () => {
         return await this.sync.fetch().then((response: AxiosResponse<T>) => {
