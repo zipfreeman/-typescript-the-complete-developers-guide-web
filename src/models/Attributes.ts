@@ -6,7 +6,7 @@ export class Attributes<T> {
     };
 
     set = (update: Partial<T>): void => {
-        return Object.assign(this.data, update);
+        Object.assign(this.data, update);
     };
 }
 
