@@ -1,30 +1,24 @@
 import axios, { AxiosResponse, AxiosPromise } from 'axios';
-import { USER_LABEL, UserProps } from './User';
+import { UserProps } from './User';
 
 interface HasId {
-    id?: number;
+    id?: string | number;
 }
 
 export class Sync<T extends HasId> {
     defaultUrl = 'http://localhost:3000/users';
 
-    constructor(public rootUrl) {}
+    constructor(public rootUrl, private data: T) {}
 
-    fetch(data: T): Promise<AxiosResponse> {
-        return axios.get(`${this.rootUrl}/${data.id}`);
-        //    .then((response: AxiosResponse) => {
-        //        this.set(response.data);
-        //    });
-    }
+    fetch = (): Promise<AxiosResponse<UserProps>> => {
+        return axios.get(`${this.rootUrl}/${this.data.id}`);
+    };
 
-    save(data: T) {
-        const id = data.id;
-
-        if (id) {
-            axios.put(`${this.rootUrl}/${id}`, data);
-            return;
+    save = (): Promise<AxiosResponse<UserProps>> => {
+        if (this.data.id && this.data.id > 0) {
+            return axios.put(`${this.rootUrl}/${this.data.id}`, this.data);
         }
 
-        axios.post(`${this.rootUrl}`, data);
-    }
+        return axios.post(`${this.rootUrl}`, this.data);
+    };
 }

@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { MyEvent, Eventing } from './Eventing';
+import { Attributes } from './Attributes';
 import { Sync } from './Sync';
 
 export interface UserProps {
@@ -7,46 +8,51 @@ export interface UserProps {
     name: string;
     age: number;
 }
+/*
+the actual User class API is event based.
+events:
+ - login
+ - logout
+ - update
+ - (maybe) delete user
 
-interface UserEvent extends MyEvent {
-    data: UserProps;
-}
+someone logs in = the user data is fetched and set
+someone changes their name or age = the user data is saved
+ -- therefore, change = set + save
 
-interface IUser {
-    get(prop: string): number | string;
-    set(update: Partial<UserProps>): void;
-    // fetch();
-    // save();
-}
+*/
 
-export class User implements IUser {
+export class User {
     constructor(private data: UserProps) {}
 
+    private url = 'http://localhost:3000/users';
+    private attributes: Attributes<UserProps> = new Attributes(this.data);
     private events: Eventing<UserProps> = new Eventing(this.data);
-    private sync: Sync<UserProps> = new Sync<UserProps>(
-        'http://localhost:3000/users'
-    );
+    private sync: Sync<UserProps> = new Sync(this.url, this.data);
 
-    url = 'http://localhost:3000/users';
+    get = this.attributes.get;
+
+    set = (update: Partial<UserProps>) => {
+        return this.attributes.set(update);
+    };
 
     on = this.events.on;
     trigger = this.events.trigger;
 
     fetch = async () => {
-        await this.sync.fetch.then((response: AxiosResponse) => {});
+        return await this.sync
+            .fetch()
+            .then((response: AxiosResponse<UserProps>) => {
+                this.data = response.data;
+                return this.data;
+            });
     };
 
-    get(prop: string): number | string {
-        return this.data[prop];
-    }
-
-    set(update: Partial<UserProps>): void {
-        Object.assign(this.data, update);
-    }
+    save = async () => {
+        return await this.sync
+            .save()
+            .then((response: AxiosResponse<UserProps>) => {
+                return response.data;
+            });
+    };
 }
-
-export const USER_LABEL = {
-    id: 'id',
-    name: 'name',
-    age: 'age',
-};
