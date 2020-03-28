@@ -33,7 +33,7 @@ export class Eventing<T> implements IEventing {
         const handlers = this.types[eventName];
         if (!handlers || handlers.length === 0) {
             console.warn(
-                new Error(`${eventName} event is not assigned to anything`)
+                new Error(`${eventName} triggers but no one is listening`)
             );
 
             return;
